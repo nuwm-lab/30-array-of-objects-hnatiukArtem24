@@ -1,101 +1,131 @@
 using System;
 
-class ArithmeticProgression
+namespace ArithmeticProgressionApp
 {
-    // Перший член прогресії
-    public double A0 { get; }
-    // Різниця прогресії
-    public double D { get; }
-    // Кількість членів
-    public int Count { get; }
-
-    // Конструктор з перевіркою правильності
-    public ArithmeticProgression(double a0, double d, int count)
+    class ArithProgression
     {
-        if (count <= 0)
-            throw new ArgumentException("Кількість елементів повинна бути більшою за 0.");
+        // Властивості
+        public double A0 { get; }
+        public double D { get; }
+        public int N { get; }
 
-        A0 = a0;
-        D = d;
-        Count = count;
-    }
-
-    // Властивість для обчислення суми
-    public double Sum => Count * (2 * A0 + (Count - 1) * D) / 2.0;
-
-    // Перевизначення ToString для зручного виводу
-    public override string ToString()
-    {
-        return $"a₀ = {A0}, d = {D}, n = {Count}, сума = {Sum:F2}";
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
-        Console.Write("Введіть кількість прогресій n: ");
-        if (!int.TryParse(Console.ReadLine(), out int n) || n <= 0)
+        // Конструктор з валідацією
+        public ArithProgression(double a0, double d, int n)
         {
-            Console.WriteLine("Некоректне значення n.");
-            return;
+            if (n <= 0)
+                throw new ArgumentException("Кількість елементів (n) повинна бути більшою за 0.");
+
+            A0 = a0;
+            D = d;
+            N = n;
         }
 
-        ArithmeticProgression[] progressions = new ArithmeticProgression[n];
-        Random random = new Random();
+        // Властивість для обчислення суми
+        public double Sum => N / 2.0 * (2 * A0 + (N - 1) * D);
 
-        Console.Write("Ви хочете вводити дані вручну? (y/n): ");
-        string? choice = Console.ReadLine();
-
-        for (int i = 0; i < n; i++)
+        public override string ToString()
         {
-            Console.WriteLine($"\nПрогресія #{i + 1}:");
+            return $"a₀ = {A0}, d = {D}, n = {N}, сума = {Sum:F2}";
+        }
+    }
 
-            double a0, d;
-            int count;
-
-            if (choice?.ToLower() == "y")
+    class Program
+    {
+        static void Main()
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.Write("Введіть кількість прогресій n: ");
+            if (!int.TryParse(Console.ReadLine(), out int n) || n <= 0)
             {
-                Console.Write("  Введіть перший член (a₀): ");
-                a0 = double.Parse(Console.ReadLine()!);
+                Console.WriteLine("Некоректне значення n.");
+                return;
+            }
 
-                Console.Write("  Введіть різницю (d): ");
-                d = double.Parse(Console.ReadLine()!);
+            ArithProgression[] progressions = new ArithProgression[n];
+            Random random = new Random();
 
-                Console.Write("  Введіть кількість членів (n): ");
-                count = int.Parse(Console.ReadLine()!);
+            Console.Write("Бажаєте вводити дані вручну? (y/n): ");
+            string? choice = Console.ReadLine();
+
+            for (int i = 0; i < n; i++)
+            {
+                progressions[i] = CreateProgression(i + 1, choice, random);
+            }
+
+            int maxIndex = FindIndexOfMaxSum(progressions);
+
+            Console.WriteLine("\n=== Усі прогресії ===");
+            for (int i = 0; i < n; i++)
+                Console.WriteLine($"#{i + 1}: {progressions[i]}");
+
+            Console.WriteLine($"\nПрогресія з найбільшою сумою — #{maxIndex + 1}");
+            Console.WriteLine(progressions[maxIndex]);
+        }
+
+        // Окремий метод для створення прогресії
+        static ArithProgression CreateProgression(int index, string? mode, Random random)
+        {
+            Console.WriteLine($"\nПрогресія #{index}:");
+            double a0, d;
+            int n;
+
+            if (mode?.ToLower() == "y")
+            {
+                a0 = ReadDouble("  Введіть перший член (a₀): ");
+                d = ReadDouble("  Введіть різницю (d): ");
+                n = ReadInt("  Введіть кількість членів (n): ");
             }
             else
             {
-                // Генеруємо випадкові значення
-                a0 = random.Next(-10, 11);     // від -10 до 10
-                d = random.Next(-5, 6);        // від -5 до 5
-                count = random.Next(1, 11);    // від 1 до 10
-                Console.WriteLine($"  Згенеровано: a₀={a0}, d={d}, n={count}");
+                a0 = random.Next(-10, 11);
+                d = random.Next(-5, 6);
+                n = random.Next(1, 11);
+                Console.WriteLine($"  Згенеровано: a₀={a0}, d={d}, n={n}");
             }
 
-            progressions[i] = new ArithmeticProgression(a0, d, count);
+            return new ArithProgression(a0, d, n);
         }
 
-        // Знаходимо прогресію з найбільшою сумою
-        int maxIndex = 0;
-        double maxSum = progressions[0].Sum;
-
-        for (int i = 1; i < n; i++)
+        // Метод для знаходження індексу прогресії з максимальною сумою
+        static int FindIndexOfMaxSum(ArithProgression[] progressions)
         {
-            if (progressions[i].Sum > maxSum)
+            if (progressions == null || progressions.Length == 0)
+                throw new ArgumentException("Масив прогресій порожній або не ініціалізований.");
+
+            int maxIndex = 0;
+            double maxSum = progressions[0].Sum;
+
+            for (int i = 1; i < progressions.Length; i++)
             {
-                maxSum = progressions[i].Sum;
-                maxIndex = i;
+                if (progressions[i].Sum > maxSum)
+                {
+                    maxSum = progressions[i].Sum;
+                    maxIndex = i;
+                }
             }
+
+            return maxIndex;
         }
 
-        Console.WriteLine("\n=== Результати ===");
-        for (int i = 0; i < n; i++)
-            Console.WriteLine($"Прогресія #{i + 1}: {progressions[i]}");
+        // Допоміжні методи для зчитування з консолі
+        static double ReadDouble(string message)
+        {
+            Console.Write(message);
+            while (!double.TryParse(Console.ReadLine(), out double value))
+            {
+                Console.Write("  Помилка! Введіть число ще раз: ");
+            }
+            return value;
+        }
 
-        Console.WriteLine($"\nНайбільша сума у прогресії #{maxIndex + 1}: {progressions[maxIndex]}");
+        static int ReadInt(string message)
+        {
+            Console.Write(message);
+            while (!int.TryParse(Console.ReadLine(), out int value) || value <= 0)
+            {
+                Console.Write("  Помилка! Введіть додатне ціле число: ");
+            }
+            return value;
+        }
     }
 }
-
