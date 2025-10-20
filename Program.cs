@@ -1,145 +1,101 @@
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 
-namespace ArithmeticProgressionApp
+class ArithmeticProgression
 {
-    class ArithmeticProgression
+    // Перший член прогресії
+    public double A0 { get; }
+    // Різниця прогресії
+    public double D { get; }
+    // Кількість членів
+    public int Count { get; }
+
+    // Конструктор з перевіркою правильності
+    public ArithmeticProgression(double a0, double d, int count)
     {
-       
-        public double A0 { get; }
-        public double D { get; }
-        public int Count { get; }
+        if (count <= 0)
+            throw new ArgumentException("Кількість елементів повинна бути більшою за 0.");
 
-      
-        public ArithmeticProgression(double a0, double d, int count)
-        {
-            if (count <= 0)
-                throw new ArgumentException("Count має бути додатнім.", nameof(count));
-
-            A0 = a0;
-            D = d;
-            Count = count;
-        }
-
-     
-        public double Sum()
-        {
-            return Count / 2.0 * (2 * A0 + (Count - 1) * D);
-        }
-
-        public override string ToString()
-        {
-            return $"A0={A0}, D={D}, Count={Count}, Sum={Sum():F2}";
-        }
+        A0 = a0;
+        D = d;
+        Count = count;
     }
 
-    class Program
+    // Властивість для обчислення суми
+    public double Sum => Count * (2 * A0 + (Count - 1) * D) / 2.0;
+
+    // Перевизначення ToString для зручного виводу
+    public override string ToString()
     {
-        static void Main()
-        {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Console.WriteLine("=== Арифметичні прогресії ===");
-
-            Console.Write("Введіть кількість прогресій (m): ");
-            if (!int.TryParse(Console.ReadLine(), out int m) || m <= 0)
-            {
-                Console.WriteLine("Некоректне число. Завершення програми.");
-                return;
-            }
-
-            var list = new List<ArithmeticProgression>();
-            var rnd = new Random();
-
-            Console.Write("Ви хочете вводити прогресії вручну? (y/n): ");
-            string choice = Console.ReadLine()?.Trim().ToLower() ?? "n";
-
-            for (int i = 0; i < m; i++)
-            {
-                double a0, d;
-                int count;
-
-                if (choice == "y")
-                {
-                    Console.WriteLine($"\nПрогресія #{i + 1}:");
-                    a0 = ReadDouble("Введіть A0: ");
-                    d = ReadDouble("Введіть D: ");
-                    count = ReadInt("Введіть Count (>0): ", minValue: 1);
-                }
-                else
-                {
-                    a0 = rnd.Next(-10, 11);
-                    d = rnd.Next(-5, 6);
-                    count = rnd.Next(1, 11);
-                }
-
-                list.Add(new ArithmeticProgression(a0, d, count));
-            }
-
-            Console.WriteLine("\n=== Результати ===");
-            for (int i = 0; i < list.Count; i++)
-                Console.WriteLine($"[{i}] {list[i]}");
-
-            // Знаходження прогресії з найбільшою сумою
-            int maxIndex = 0;
-            double maxSum = list[0].Sum();
-
-            for (int i = 1; i < list.Count; i++)
-            {
-                double sum = list[i].Sum();
-                if (sum > maxSum)
-                {
-                    maxSum = sum;
-                    maxIndex = i;
-                }
-            }
-
-            Console.WriteLine($"\nПрогресія з найбільшою сумою:");
-            Console.WriteLine($"Індекс: {maxIndex}");
-            Console.WriteLine(list[maxIndex]);
-
-          
-            RunManualTests();
-
-            Console.WriteLine("\nНатисніть Enter для виходу...");
-            Console.ReadLine();
-        }
-
-     
-
-        static double ReadDouble(string prompt)
-        {
-            while (true)
-            {
-                Console.Write(prompt);
-                string? input = Console.ReadLine();
-                if (double.TryParse(input, NumberStyles.Float, CultureInfo.InvariantCulture, out double value))
-                    return value;
-                Console.WriteLine("Невірний формат. Спробуйте ще раз (використовуйте крапку як роздільник).");
-            }
-        }
-
-        static int ReadInt(string prompt, int minValue = int.MinValue)
-        {
-            while (true)
-            {
-                Console.Write(prompt);
-                if (int.TryParse(Console.ReadLine(), out int value) && value >= minValue)
-                    return value;
-                Console.WriteLine("Невірне значення. Спробуйте ще раз.");
-            }
-        }
-
-        static void RunManualTests()
-        {
-            Console.WriteLine("\n=== Перевірка правильності формули ===");
-
-            var test1 = new ArithmeticProgression(1, 1, 5);
-            var test2 = new ArithmeticProgression(2, 3, 4); 
-            var test3 = new ArithmeticProgression(10, -2, 5); 
-            Console.WriteLine($"Очікується 15 → {test1.Sum()}");
-            Console.WriteLine($"Очікується 26 → {test2.Sum()}");
-            Console.WriteLine($"Очікується 30 → {test3.Sum()}");
-        }
+        return $"a₀ = {A0}, d = {D}, n = {Count}, сума = {Sum:F2}";
     }
 }
+
+class Program
+{
+    static void Main()
+    {
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+        Console.Write("Введіть кількість прогресій n: ");
+        if (!int.TryParse(Console.ReadLine(), out int n) || n <= 0)
+        {
+            Console.WriteLine("Некоректне значення n.");
+            return;
+        }
+
+        ArithmeticProgression[] progressions = new ArithmeticProgression[n];
+        Random random = new Random();
+
+        Console.Write("Ви хочете вводити дані вручну? (y/n): ");
+        string? choice = Console.ReadLine();
+
+        for (int i = 0; i < n; i++)
+        {
+            Console.WriteLine($"\nПрогресія #{i + 1}:");
+
+            double a0, d;
+            int count;
+
+            if (choice?.ToLower() == "y")
+            {
+                Console.Write("  Введіть перший член (a₀): ");
+                a0 = double.Parse(Console.ReadLine()!);
+
+                Console.Write("  Введіть різницю (d): ");
+                d = double.Parse(Console.ReadLine()!);
+
+                Console.Write("  Введіть кількість членів (n): ");
+                count = int.Parse(Console.ReadLine()!);
+            }
+            else
+            {
+                // Генеруємо випадкові значення
+                a0 = random.Next(-10, 11);     // від -10 до 10
+                d = random.Next(-5, 6);        // від -5 до 5
+                count = random.Next(1, 11);    // від 1 до 10
+                Console.WriteLine($"  Згенеровано: a₀={a0}, d={d}, n={count}");
+            }
+
+            progressions[i] = new ArithmeticProgression(a0, d, count);
+        }
+
+        // Знаходимо прогресію з найбільшою сумою
+        int maxIndex = 0;
+        double maxSum = progressions[0].Sum;
+
+        for (int i = 1; i < n; i++)
+        {
+            if (progressions[i].Sum > maxSum)
+            {
+                maxSum = progressions[i].Sum;
+                maxIndex = i;
+            }
+        }
+
+        Console.WriteLine("\n=== Результати ===");
+        for (int i = 0; i < n; i++)
+            Console.WriteLine($"Прогресія #{i + 1}: {progressions[i]}");
+
+        Console.WriteLine($"\nНайбільша сума у прогресії #{maxIndex + 1}: {progressions[maxIndex]}");
+    }
+}
+
