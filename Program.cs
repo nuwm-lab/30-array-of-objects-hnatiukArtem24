@@ -4,12 +4,12 @@ namespace ArithmeticProgressionApp
 {
     class ArithmeticProgression
     {
-        // Властивості
+      
         public double A0 { get; }  // перший член
         public double D { get; }   // різниця
         public int N { get; }      // кількість членів
 
-        // Конструктор з валідацією
+  
         public ArithmeticProgression(double a0, double d, int n)
         {
             if (n <= 0)
@@ -20,7 +20,7 @@ namespace ArithmeticProgressionApp
             N = n;
         }
 
-        // Властивість для обчислення суми
+     
         public double Sum => N / 2.0 * (2 * A0 + (N - 1) * D);
 
         public override string ToString()
@@ -87,7 +87,7 @@ namespace ArithmeticProgressionApp
             return new ArithmeticProgression(a0, d, n);
         }
 
-        // Метод для знаходження індексу прогресії з максимальною сумою
+      
         static int FindIndexOfMaxSum(ArithmeticProgression[] progressions)
         {
             if (progressions == null || progressions.Length == 0)
@@ -109,7 +109,7 @@ namespace ArithmeticProgressionApp
             return maxIndex;
         }
 
-        // Допоміжні методи для зчитування з консолі
+      і
         static double ReadDouble(string message)
         {
             double value;
