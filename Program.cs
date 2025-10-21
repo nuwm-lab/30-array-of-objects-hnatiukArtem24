@@ -63,7 +63,7 @@ namespace ArithmeticProgressionApp
             Console.WriteLine(progressions[maxIndex]);
         }
 
-        // Метод для створення прогресії
+     
         static ArithmeticProgression CreateProgression(int index, string? mode, Random random)
         {
             Console.WriteLine($"\nПрогресія #{index}:");
