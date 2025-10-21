@@ -2,15 +2,15 @@ using System;
 
 namespace ArithmeticProgressionApp
 {
-    class ArithProgression
+    class ArithmeticProgression
     {
         // Властивості
-        public double A0 { get; }
-        public double D { get; }
-        public int N { get; }
+        public double A0 { get; }  // перший член
+        public double D { get; }   // різниця
+        public int N { get; }      // кількість членів
 
         // Конструктор з валідацією
-        public ArithProgression(double a0, double d, int n)
+        public ArithmeticProgression(double a0, double d, int n)
         {
             if (n <= 0)
                 throw new ArgumentException("Кількість елементів (n) повинна бути більшою за 0.");
@@ -35,17 +35,18 @@ namespace ArithmeticProgressionApp
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Console.Write("Введіть кількість прогресій n: ");
+
             if (!int.TryParse(Console.ReadLine(), out int n) || n <= 0)
             {
                 Console.WriteLine("Некоректне значення n.");
                 return;
             }
 
-            ArithProgression[] progressions = new ArithProgression[n];
-            Random random = new Random();
+            var progressions = new ArithmeticProgression[n];
+            var random = new Random();
 
             Console.Write("Бажаєте вводити дані вручну? (y/n): ");
-            string? choice = Console.ReadLine();
+            string? choice = Console.ReadLine()?.Trim().ToLower();
 
             for (int i = 0; i < n; i++)
             {
@@ -62,14 +63,14 @@ namespace ArithmeticProgressionApp
             Console.WriteLine(progressions[maxIndex]);
         }
 
-        // Окремий метод для створення прогресії
-        static ArithProgression CreateProgression(int index, string? mode, Random random)
+        // Метод для створення прогресії
+        static ArithmeticProgression CreateProgression(int index, string? mode, Random random)
         {
             Console.WriteLine($"\nПрогресія #{index}:");
             double a0, d;
             int n;
 
-            if (mode?.ToLower() == "y")
+            if (mode == "y")
             {
                 a0 = ReadDouble("  Введіть перший член (a₀): ");
                 d = ReadDouble("  Введіть різницю (d): ");
@@ -79,15 +80,15 @@ namespace ArithmeticProgressionApp
             {
                 a0 = random.Next(-10, 11);
                 d = random.Next(-5, 6);
-                n = random.Next(1, 11);
+                n = random.Next(2, 11);
                 Console.WriteLine($"  Згенеровано: a₀={a0}, d={d}, n={n}");
             }
 
-            return new ArithProgression(a0, d, n);
+            return new ArithmeticProgression(a0, d, n);
         }
 
         // Метод для знаходження індексу прогресії з максимальною сумою
-        static int FindIndexOfMaxSum(ArithProgression[] progressions)
+        static int FindIndexOfMaxSum(ArithmeticProgression[] progressions)
         {
             if (progressions == null || progressions.Length == 0)
                 throw new ArgumentException("Масив прогресій порожній або не ініціалізований.");
@@ -97,9 +98,10 @@ namespace ArithmeticProgressionApp
 
             for (int i = 1; i < progressions.Length; i++)
             {
-                if (progressions[i].Sum > maxSum)
+                double sum = progressions[i].Sum;
+                if (sum > maxSum)
                 {
-                    maxSum = progressions[i].Sum;
+                    maxSum = sum;
                     maxIndex = i;
                 }
             }
@@ -110,8 +112,9 @@ namespace ArithmeticProgressionApp
         // Допоміжні методи для зчитування з консолі
         static double ReadDouble(string message)
         {
+            double value;
             Console.Write(message);
-            while (!double.TryParse(Console.ReadLine(), out double value))
+            while (!double.TryParse(Console.ReadLine(), out value))
             {
                 Console.Write("  Помилка! Введіть число ще раз: ");
             }
@@ -120,8 +123,9 @@ namespace ArithmeticProgressionApp
 
         static int ReadInt(string message)
         {
+            int value;
             Console.Write(message);
-            while (!int.TryParse(Console.ReadLine(), out int value) || value <= 0)
+            while (!int.TryParse(Console.ReadLine(), out value) || value <= 0)
             {
                 Console.Write("  Помилка! Введіть додатне ціле число: ");
             }
@@ -129,3 +133,4 @@ namespace ArithmeticProgressionApp
         }
     }
 }
+
